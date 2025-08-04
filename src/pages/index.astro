@@ -4,25 +4,202 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard de Análisis de Campañas</title>
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
   <!-- React & ReactDOM CDN -->
   <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <!-- Babel para compilar JSX en el navegador -->
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  <!-- Font Awesome Icons - Se ha simplificado el enlace para evitar problemas de carga -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
   <!--
-    NOTA IMPORTANTE: 
-    Este código usa React y ReactDOM desde un CDN para que el navegador lo ejecute directamente.
-    Babel se usa para compilar el JSX (el código tipo HTML dentro del JavaScript) en tiempo real.
-    Esto permite que todo funcione en un solo archivo HTML, sin necesidad de un proceso de "build".
+    NOTA IMPORTANTE: Los estilos y los iconos ahora están inlined directamente en este archivo
+    para evitar problemas de carga de recursos externos en el entorno de vista previa.
   -->
   <style>
+    /* Reset básico y variables de fuente */
     body {
       font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+      background-color: #f9fafb; /* bg-gray-50 */
+      color: #111827; /* text-gray-900 */
+      padding: 24px; /* p-6 */
     }
+
+    @media (min-width: 768px) {
+      body {
+        padding: 40px; /* md:p-10 */
+      }
+    }
+
+    .container {
+      max-width: 1280px; /* max-w-7xl */
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .section-card {
+      background-color: #ffffff;
+      border-radius: 1rem; /* rounded-2xl */
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-xl */
+      padding: 24px; /* p-6 */
+    }
+
+    .grid-container {
+      display: grid;
+      gap: 24px; /* gap-6 */
+    }
+
+    .grid-cols-1 {
+      grid-template-columns: repeat(1, minmax(0, 1fr));
+    }
+
+    @media (min-width: 768px) {
+      .md-grid-cols-4 {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+    }
+    
+    @media (min-width: 1024px) {
+      .lg-grid-cols-2 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    /* Estilos para botones de filtro */
+    .filter-button {
+      padding-left: 1rem;
+      padding-right: 1rem;
+      padding-top: 0.5rem;
+      padding-bottom: 0.5rem;
+      border-radius: 9999px; /* rounded-full */
+      font-size: 0.875rem; /* text-sm */
+      font-weight: 500; /* font-medium */
+      transition-property: background-color, color;
+      transition-duration: 200ms;
+      background-color: #f3f4f6; /* bg-gray-100 */
+      color: #4b5563; /* text-gray-700 */
+    }
+
+    .filter-button:hover {
+      background-color: #e5e7eb; /* hover:bg-gray-200 */
+    }
+
+    .filter-button.active {
+      background-color: #2563eb; /* bg-blue-600 */
+      color: #ffffff; /* text-white */
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* shadow-lg */
+    }
+
+    /* Estilos para la tabla */
+    .table-container {
+      overflow-x: auto;
+    }
+
+    .table-header {
+      background-color: #f9fafb; /* bg-gray-50 */
+    }
+
+    .table-header th {
+      padding: 12px 24px; /* px-6 py-3 */
+      text-align: left;
+      font-size: 0.75rem; /* text-xs */
+      font-weight: 500; /* font-medium */
+      color: #6b7280; /* text-gray-500 */
+      text-transform: uppercase;
+      letter-spacing: 0.05em; /* tracking-wider */
+    }
+
+    .table-cell {
+      padding: 16px 24px; /* px-6 py-4 */
+      white-space: nowrap;
+      font-size: 0.875rem; /* text-sm */
+    }
+
+    .table-cell-medium {
+      font-weight: 500; /* font-medium */
+      color: #111827; /* text-gray-900 */
+      text-transform: capitalize;
+    }
+    
+    .table-cell-normal {
+      color: #6b7280; /* text-gray-500 */
+    }
+
+    /* Estilos para el gráfico de barras */
+    .bar-chart-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      height: 256px; /* h-64 */
+      padding: 16px; /* p-4 */
+    }
+
+    .bar-chart-bar-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex-grow: 1;
+      margin-left: 16px;
+      margin-right: 16px;
+    }
+
+    .bar-chart-bar {
+      width: 100%;
+      flex-grow: 1;
+      display: flex;
+      align-items: flex-end;
+    }
+    
+    .bar-chart-bar-inner {
+      width: 100%;
+      border-top-left-radius: 0.5rem; /* rounded-t-lg */
+      border-top-right-radius: 0.5rem; /* rounded-t-lg */
+      background-color: #3b82f6; /* bg-blue-500 */
+      transition: height 0.5s ease-in-out;
+    }
+
+    .bar-chart-label {
+      margin-top: 8px; /* mt-2 */
+      font-size: 0.875rem; /* text-sm */
+      color: #4b5563; /* text-gray-600 */
+      font-weight: 500; /* font-medium */
+      text-transform: capitalize;
+    }
+    
+    .bar-chart-value {
+      margin-top: 4px; /* mt-1 */
+      font-size: 0.75rem; /* text-xs */
+      color: #111827; /* text-gray-800 */
+      font-weight: 700; /* font-bold */
+    }
+
+    /* Estilos de texto */
+    .text-4xl { font-size: 2.25rem; }
+    .text-5xl { font-size: 3rem; }
+    .font-extrabold { font-weight: 800; }
+    .font-bold { font-weight: 700; }
+    .text-gray-800 { color: #1f2937; }
+    .text-gray-500 { color: #6b7280; }
+    .text-xl { font-size: 1.25rem; }
+    .mb-8 { margin-bottom: 2rem; }
+    .flex { display: flex; }
+    .flex-wrap { flex-wrap: wrap; }
+    .gap-2 { gap: 0.5rem; }
+    .items-center { align-items: center; }
+    .mb-4 { margin-bottom: 1rem; }
+    .mr-2 { margin-right: 0.5rem; }
+    .text-gray-600 { color: #4b5563; }
+    .font-semibold { font-weight: 600; }
+    .text-base { font-size: 1rem; }
+    .text-sm { font-size: 0.875rem; }
+    .flex-col { flex-direction: column; }
+    .items-start { align-items: flex-start; }
+    .gap-3 { gap: 0.75rem; }
+    .text-2xl { font-size: 1.5rem; }
+    .mb-2 { margin-bottom: 0.5rem; }
+    .divide-y { border-top-width: 1px; border-bottom-width: 1px; }
+    .divide-gray-200 { border-color: #e5e7eb; }
+    .whitespace-nowrap { white-space: nowrap; }
+    .font-medium { font-weight: 500; }
+    .tracking-wider { letter-spacing: 0.05em; }
   </style>
 </head>
 <body class="bg-gray-50">
@@ -31,7 +208,7 @@
   <script type="text/babel">
     const { useState, useEffect } = React;
 
-    // Función para concatenar clases de Tailwind
+    // Función para concatenar clases de Tailwind (ya no tan necesaria, pero se mantiene la lógica)
     const cn = (...classNames) => classNames.filter(Boolean).join(' ');
 
     const App = () => {
@@ -219,206 +396,216 @@
       
       const getButtonClass = (filterType, filterValue) => {
         return cn(
-          'px-4 py-2 rounded-full text-sm font-medium transition-colors duration-200',
-          filters[filterType] === filterValue
-            ? 'bg-blue-600 text-white shadow-lg'
-            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+          'filter-button',
+          filters[filterType] === filterValue ? 'active' : ''
         );
       };
 
+      // SVG Icons - ahora inlined
+      const DollarSignIcon = () => (
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" class="text-gray-500"><path d="M12 1v22"></path><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+      );
+      const ChartBarIcon = () => (
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" class="text-gray-500"><line x1="12" y1="20" x2="12" y2="10"></line><line x1="18" y1="20" x2="18" y2="4"></line><line x1="6" y1="20" x2="6" y2="16"></line></svg>
+      );
+      const BullseyeIcon = () => (
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" class="text-gray-500"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="4"></circle><line x1="15.05" y1="15.05" x2="17.9" y2="17.9"></line><line x1="8.95" y1="8.95" x2="6.1" y2="6.1"></line><line x1="15.05" y1="8.95" x2="17.9" y2="6.1"></line><line x1="8.95" y1="15.05" x2="6.1" y2="17.9"></line></svg>
+      );
+      const UsersIcon = () => (
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" class="text-gray-500"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+      );
+
       return (
-        <div className="min-h-screen bg-gray-50 font-sans p-6 md:p-10">
-          <div className="max-w-7xl mx-auto">
-            <h1 className="text-4xl md:text-5xl font-extrabold text-gray-800 mb-2">
-              Dashboard de Análisis de Campañas
-            </h1>
-            <p className="text-xl text-gray-500 mb-8">
-              Análisis interactivo de rendimiento de Google y Meta
-            </p>
+        <div className="container">
+          <h1 className="text-4xl md:text-5xl font-extrabold text-gray-800 mb-2">
+            Dashboard de Análisis de Campañas
+          </h1>
+          <p className="text-xl text-gray-500 mb-8">
+            Análisis interactivo de rendimiento de Google y Meta
+          </p>
 
-            {/* Botones de Filtro */}
-            <div className="bg-white rounded-2xl shadow-xl p-6 mb-8">
-              <div className="flex flex-wrap gap-2 items-center mb-4">
-                <span className="text-gray-600 font-semibold text-base mr-2">Plataforma:</span>
-                <button
-                  onClick={() => setFilters({ ...filters, plataforma: 'all' })}
-                  className={getButtonClass('plataforma', 'all')}
-                >
-                  Todas
-                </button>
-                <button
-                  onClick={() => setFilters({ ...filters, plataforma: 'google' })}
-                  className={getButtonClass('plataforma', 'google')}
-                >
-                  Google
-                </button>
-                <button
-                  onClick={() => setFilters({ ...filters, plataforma: 'meta' })}
-                  className={getButtonClass('plataforma', 'meta')}
-                >
-                  Meta
-                </button>
-              </div>
-              <div className="flex flex-wrap gap-2 items-center mb-4">
-                <span className="text-gray-600 font-semibold text-base mr-2">Business Unit:</span>
-                <button
-                  onClick={() => setFilters({ ...filters, businessUnit: 'all' })}
-                  className={getButtonClass('businessUnit', 'all')}
-                >
-                  Todas
-                </button>
-                {['Tennis', 'Padel', 'Basketball', 'Sportswear'].map((bu) => (
-                  <button
-                    key={bu}
-                    onClick={() => setFilters({ ...filters, businessUnit: bu.toLowerCase() })}
-                    className={getButtonClass('businessUnit', bu.toLowerCase())}
-                  >
-                    {bu}
-                  </button>
-                ))}
-              </div>
-              <div className="flex flex-wrap gap-2 items-center">
-                <span className="text-gray-600 font-semibold text-base mr-2">Territorio:</span>
-                <button
-                  onClick={() => setFilters({ ...filters, territorio: 'all' })}
-                  className={getButtonClass('territorio', 'all')}
-                >
-                  Todos
-                </button>
-                {['Alemania', 'España', 'Francia', 'Italia', 'Reino Unido'].map((territorio) => (
-                  <button
-                    key={territorio}
-                    onClick={() => setFilters({ ...filters, territorio: territorio.toLowerCase() })}
-                    className={getButtonClass('territorio', territorio.toLowerCase())}
-                  >
-                    {territorio}
-                  </button>
-                ))}
-              </div>
+          {/* Botones de Filtro */}
+          <div className="section-card mb-8">
+            <div className="flex flex-wrap gap-2 items-center mb-4">
+              <span className="text-gray-600 font-semibold text-base mr-2">Plataforma:</span>
+              <button
+                onClick={() => setFilters({ ...filters, plataforma: 'all' })}
+                className={getButtonClass('plataforma', 'all')}
+              >
+                Todas
+              </button>
+              <button
+                onClick={() => setFilters({ ...filters, plataforma: 'google' })}
+                className={getButtonClass('plataforma', 'google')}
+              >
+                Google
+              </button>
+              <button
+                onClick={() => setFilters({ ...filters, plataforma: 'meta' })}
+                className={getButtonClass('plataforma', 'meta')}
+              >
+                Meta
+              </button>
             </div>
+            <div className="flex flex-wrap gap-2 items-center mb-4">
+              <span className="text-gray-600 font-semibold text-base mr-2">Business Unit:</span>
+              <button
+                onClick={() => setFilters({ ...filters, businessUnit: 'all' })}
+                className={getButtonClass('businessUnit', 'all')}
+              >
+                Todas
+              </button>
+              {['Tennis', 'Padel', 'Basketball', 'Sportswear'].map((bu) => (
+                <button
+                  key={bu}
+                  onClick={() => setFilters({ ...filters, businessUnit: bu.toLowerCase() })}
+                  className={getButtonClass('businessUnit', bu.toLowerCase())}
+                >
+                  {bu}
+                </button>
+              ))}
+            </div>
+            <div className="flex flex-wrap gap-2 items-center">
+              <span className="text-gray-600 font-semibold text-base mr-2">Territorio:</span>
+              <button
+                onClick={() => setFilters({ ...filters, territorio: 'all' })}
+                className={getButtonClass('territorio', 'all')}
+              >
+                Todos
+              </button>
+              {['Alemania', 'España', 'Francia', 'Italia', 'Reino Unido'].map((territorio) => (
+                <button
+                  key={territorio}
+                  onClick={() => setFilters({ ...filters, territorio: territorio.toLowerCase() })}
+                  className={getButtonClass('territorio', territorio.toLowerCase())}
+                >
+                  {territorio}
+                </button>
+              ))}
+            </div>
+          </div>
 
-            {/* KPIs Globales */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-              <div className="bg-white rounded-2xl shadow-xl p-6 flex flex-col items-start">
-                <div className="flex items-center gap-3 text-gray-500 mb-2">
-                  <i className="fas fa-dollar-sign text-2xl text-gray-500"></i>
-                  <span className="font-semibold text-lg">Costo Total</span>
-                </div>
-                <span className="text-4xl font-bold text-gray-800">
-                  {formatCurrency(totalCost)}
-                </span>
+          {/* KPIs Globales */}
+          <div className="grid-container md-grid-cols-4 mb-8">
+            <div className="section-card flex flex-col items-start">
+              <div className="flex items-center gap-3 text-gray-500 mb-2">
+                <DollarSignIcon />
+                <span className="font-semibold text-lg">Costo Total</span>
               </div>
-              <div className="bg-white rounded-2xl shadow-xl p-6 flex flex-col items-start">
-                <div className="flex items-center gap-3 text-gray-500 mb-2">
-                  <i className="fas fa-chart-bar text-2xl text-gray-500"></i>
-                  <span className="font-semibold text-lg">Valor de Conversión</span>
-                </div>
-                <span className="text-4xl font-bold text-gray-800">
-                  {formatCurrency(totalValue)}
-                </span>
-              </div>
-              <div className="bg-white rounded-2xl shadow-xl p-6 flex flex-col items-start">
-                <div className="flex items-center gap-3 text-gray-500 mb-2">
-                  <i className="fas fa-bullseye text-2xl text-gray-500"></i>
-                  <span className="font-semibold text-lg">ROAS Global</span>
-                </div>
-                <span className="text-4xl font-bold text-gray-800">
-                  {formatNumber(globalROAS)}x
-                </span>
-              </div>
-              <div className="bg-white rounded-2xl shadow-xl p-6 flex flex-col items-start">
-                <div className="flex items-center gap-3 text-gray-500 mb-2">
-                  <i className="fas fa-users text-2xl text-gray-500"></i>
-                  <span className="font-semibold text-lg">CPA Global</span>
-                </div>
-                <span className="text-4xl font-bold text-gray-800">
-                  {formatCurrency(globalCPA)}
-                </span>
-              </div>
+              <span className="text-4xl font-bold text-gray-800">
+                {formatCurrency(totalCost)}
+              </span>
             </div>
-            
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-                {/* Tabla de ROAS y CPA por Business Unit */}
-                <div className="bg-white rounded-2xl shadow-xl p-6">
-                    <h2 className="text-2xl font-bold text-gray-800 mb-4">Rendimiento por Business Unit</h2>
-                    <div className="overflow-x-auto">
-                        <table className="min-w-full divide-y divide-gray-200">
-                            <thead>
-                                <tr className="bg-gray-50">
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Business Unit</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Costo</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ROAS</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">CPA</th>
-                                </tr>
-                            </thead>
-                            <tbody className="bg-white divide-y divide-gray-200">
-                                {Object.entries(groupedByBU).map(([bu, data]) => (
-                                    <tr key={bu}>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 capitalize">{bu}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatCurrency(data.coste)}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.coste > 0 ? `${formatNumber(data.valorConv / data.coste)}x` : '-'}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.conversionsPlatform > 0 ? formatCurrency(data.coste / data.conversionsPlatform) : '-'}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+            <div className="section-card flex flex-col items-start">
+              <div className="flex items-center gap-3 text-gray-500 mb-2">
+                <ChartBarIcon />
+                <span className="font-semibold text-lg">Valor de Conversión</span>
+              </div>
+              <span className="text-4xl font-bold text-gray-800">
+                {formatCurrency(totalValue)}
+              </span>
+            </div>
+            <div className="section-card flex flex-col items-start">
+              <div className="flex items-center gap-3 text-gray-500 mb-2">
+                <BullseyeIcon />
+                <span className="font-semibold text-lg">ROAS Global</span>
+              </div>
+              <span className="text-4xl font-bold text-gray-800">
+                {formatNumber(globalROAS)}x
+              </span>
+            </div>
+            <div className="section-card flex flex-col items-start">
+              <div className="flex items-center gap-3 text-gray-500 mb-2">
+                <UsersIcon />
+                <span className="font-semibold text-lg">CPA Global</span>
+              </div>
+              <span className="text-4xl font-bold text-gray-800">
+                {formatCurrency(globalCPA)}
+              </span>
+            </div>
+          </div>
+          
+          <div className="grid-container lg-grid-cols-2 mb-8">
+              {/* Tabla de ROAS y CPA por Business Unit */}
+              <div className="section-card">
+                  <h2 className="text-2xl font-bold text-gray-800 mb-4">Rendimiento por Business Unit</h2>
+                  <div className="table-container">
+                      <table className="min-w-full divide-y divide-gray-200">
+                          <thead>
+                              <tr className="table-header">
+                                  <th className="table-cell">Business Unit</th>
+                                  <th className="table-cell">Costo</th>
+                                  <th className="table-cell">ROAS</th>
+                                  <th className="table-cell">CPA</th>
+                              </tr>
+                          </thead>
+                          <tbody className="bg-white divide-y divide-gray-200">
+                              {Object.entries(groupedByBU).map(([bu, data]) => (
+                                  <tr key={bu}>
+                                      <td className="table-cell table-cell-medium capitalize">{bu}</td>
+                                      <td className="table-cell table-cell-normal">{formatCurrency(data.coste)}</td>
+                                      <td className="table-cell table-cell-normal">{data.coste > 0 ? `${formatNumber(data.valorConv / data.coste)}x` : '-'}</td>
+                                      <td className="table-cell table-cell-normal">{data.conversionsPlatform > 0 ? formatCurrency(data.coste / data.conversionsPlatform) : '-'}</td>
+                                  </tr>
+                              ))}
+                          </tbody>
+                      </table>
+                  </div>
+              </div>
 
-                {/* Tabla de Conversiones vs CRM */}
-                <div className="bg-white rounded-2xl shadow-xl p-6">
-                    <h2 className="text-2xl font-bold text-gray-800 mb-4">Conversiones: Plataforma vs. CRM</h2>
-                    <div className="overflow-x-auto">
-                        <table className="min-w-full divide-y divide-gray-200">
-                            <thead>
-                                <tr className="bg-gray-50">
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Territorio</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Plataforma</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">CRM</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Discrepancia</th>
-                                </tr>
-                            </thead>
-                            <tbody className="bg-white divide-y divide-gray-200">
-                                {Object.entries(groupedByTerritory).map(([territorio, data]) => (
-                                    <tr key={territorio}>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 capitalize">{territorio}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatNumber(data.conversionsPlatform)}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatNumber(data.conversionsCRM)}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-bold">
-                                            {formatNumber(data.conversionsCRM - data.conversionsPlatform)}
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
+              {/* Tabla de Conversiones vs CRM */}
+              <div className="section-card">
+                  <h2 className="text-2xl font-bold text-gray-800 mb-4">Conversiones: Plataforma vs. CRM</h2>
+                  <div className="table-container">
+                      <table className="min-w-full divide-y divide-gray-200">
+                          <thead>
+                              <tr className="table-header">
+                                  <th className="table-cell">Territorio</th>
+                                  <th className="table-cell">Plataforma</th>
+                                  <th className="table-cell">CRM</th>
+                                  <th className="table-cell">Discrepancia</th>
+                              </tr>
+                          </thead>
+                          <tbody className="bg-white divide-y divide-gray-200">
+                              {Object.entries(groupedByTerritory).map(([territorio, data]) => (
+                                  <tr key={territorio}>
+                                      <td className="table-cell table-cell-medium capitalize">{territorio}</td>
+                                      <td className="table-cell table-cell-normal">{formatNumber(data.conversionsPlatform)}</td>
+                                      <td className="table-cell table-cell-normal">{formatNumber(data.conversionsCRM)}</td>
+                                      <td className="table-cell table-cell-normal font-bold">
+                                          {formatNumber(data.conversionsCRM - data.conversionsPlatform)}
+                                      </td>
+                                  </tr>
+                              ))}
+                          </tbody>
+                      </table>
+                  </div>
+              </div>
+          </div>
 
-            {/* Gráfico de ROAS por Plataforma */}
-            <div className="bg-white rounded-2xl shadow-xl p-6 mb-8">
-                <h2 className="text-2xl font-bold text-gray-800 mb-4">ROAS Promedio por Plataforma</h2>
-                <div className="flex justify-between items-end h-64 p-4">
-                    {Object.entries(groupedByPlatform).map(([platform, data]) => {
-                        const roas = data.coste > 0 ? data.valorConv / data.coste : 0;
-                        const allRoas = Object.values(groupedByPlatform).map(d => d.coste > 0 ? d.valorConv / d.coste : 0);
-                        const maxRoas = Math.max(...allRoas);
-                        const height = maxRoas > 0 ? (roas / maxRoas) * 100 : 0;
-                        return (
-                            <div key={platform} className="flex flex-col items-center flex-grow mx-4">
-                                <div className="w-full flex-grow flex items-end">
-                                    <div
-                                        className="w-full rounded-t-lg bg-blue-500 transition-all duration-500 ease-in-out"
-                                        style={{ height: `${height}%` }}
-                                    ></div>
-                                </div>
-                                <span className="mt-2 text-sm text-gray-600 font-medium capitalize">{platform}</span>
-                                <span className="mt-1 text-xs text-gray-800 font-bold">{formatNumber(roas)}x</span>
-                            </div>
-                        );
-                    })}
-                </div>
-            </div>
+          {/* Gráfico de ROAS por Plataforma */}
+          <div className="section-card mb-8">
+              <h2 className="text-2xl font-bold text-gray-800 mb-4">ROAS Promedio por Plataforma</h2>
+              <div className="bar-chart-container">
+                  {Object.entries(groupedByPlatform).map(([platform, data]) => {
+                      const roas = data.coste > 0 ? data.valorConv / data.coste : 0;
+                      const allRoas = Object.values(groupedByPlatform).map(d => d.coste > 0 ? d.valorConv / d.coste : 0);
+                      const maxRoas = Math.max(...allRoas);
+                      const height = maxRoas > 0 ? (roas / maxRoas) * 100 : 0;
+                      return (
+                          <div key={platform} className="bar-chart-bar-wrapper">
+                              <div className="bar-chart-bar">
+                                  <div
+                                      className="bar-chart-bar-inner"
+                                      style={{ height: `${height}%` }}
+                                  ></div>
+                              </div>
+                              <span className="bar-chart-label capitalize">{platform}</span>
+                              <span className="bar-chart-value">{formatNumber(roas)}x</span>
+                          </div>
+                      );
+                  })}
+              </div>
           </div>
         </div>
       );
