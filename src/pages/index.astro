@@ -1,398 +1,433 @@
-import { useState, useEffect } from 'react';
-import { cn } from './lib/utils';
-import { BarChart, Users, DollarSign, Target, ArrowDown, ArrowUp } from 'lucide-react';
-
-const App = () => {
-  // Datos iniciales de las plataformas y el CRM
-  const initialDataMeta = [
-    { Canal: 'META', Territorio: 'Alemania', 'Business unit': 'Tennis', Campaña: 'ADSM_DE_Tennis_ASC_Conversions_Ongoing Campaign', Coste: 3878.89, Impr: 556239, Clics: 15890, Conversiones: 181, 'Valor de la conversión': 23867.06 },
-    { Canal: 'META', Territorio: 'Alemania', 'Business unit': 'Sportswear', Campaña: 'ADSM_De_Sportswear_ASC_Conversions_Ongoing Campaign', Coste: 3523.78, Impr: 467213, Clics: 12317, Conversiones: 241, 'Valor de la conversión': 31783.97 },
-    { Canal: 'META', Territorio: 'Alemania', 'Business unit': 'Padel', Campaña: 'ADSM_De_Padel_ASC_Conversions_Ongoing Campaign', Coste: 2307.62, Impr: 281859, Clics: 2966, Conversiones: 118, 'Valor de la conversión': 18692.04 },
-    { Canal: 'META', Territorio: 'Alemania', 'Business unit': 'Basketball', Campaña: 'ADSM_De_Basketball_ASC_Conversions_Ongoing Campaign', Coste: 1545.74, Impr: 249431, Clics: 5893, Conversiones: 85, 'Valor de la conversión': 6740.19 },
-    { Canal: 'META', Territorio: 'España', 'Business unit': 'Tennis', Campaña: 'ADSM_ES_Tennis_ASC_Conversions_Ongoing Campaign', Coste: 5495.8, Impr: 1963362, Clics: 15805, Conversiones: 199, 'Valor de la conversión': 23291.88 },
-    { Canal: 'META', Territorio: 'España', 'Business unit': 'Sportswear', Campaña: 'ADSM_Es_Sportswear_ASC_Conversions_Ongoing Campaign', Coste: 5272.09, Impr: 1591100, Clics: 16164, Conversiones: 177, 'Valor de la conversión': 17863.3 },
-    { Canal: 'META', Territorio: 'España', 'Business unit': 'Padel', Campaña: 'ADSM_Es_Padel_ASC_Conversions_Ongoing Campaign', Coste: 3199.58, Impr: 1303509, Clics: 10220, Conversiones: 172, 'Valor de la conversión': 15435.96 },
-    { Canal: 'META', Territorio: 'España', 'Business unit': 'Basketball', Campaña: 'ADSM_Es_Basketball_ASC_Conversions_Ongoing Campaign', Coste: 2313.56, Impr: 868735, Clics: 3298, Conversiones: 83, 'Valor de la conversión': 9110.31 },
-    { Canal: 'META', Territorio: 'Francia', 'Business unit': 'Sportswear', Campaña: 'ADSM_FR_Sportswear_ASC_Conversions_Ongoing Campaign', Coste: 8817.61, Impr: 1595817, Clics: 24164, Conversiones: 347, 'Valor de la conversión': 35702.94 },
-    { Canal: 'META', Territorio: 'Francia', 'Business unit': 'Tennis', Campaña: 'ADSM_Fr_Tennis_ASC_Conversions_Ongoing Campaign', Coste: 8628.32, Impr: 2314681, Clics: 22359, Conversiones: 352, 'Valor de la conversión': 43996.98 },
-    { Canal: 'META', Territorio: 'Francia', 'Business unit': 'Padel', Campaña: 'ADSM_Fr_Padel_ASC_Conversions_Ongoing Campaign', Coste: 5095.07, Impr: 1243084, Clics: 12229, Conversiones: 211, 'Valor de la conversión': 26160.93 },
-    { Canal: 'META', Territorio: 'Francia', 'Business unit': 'Basketball', Campaña: 'ADSM_Fr_Basketball_ASC_Conversions_Ongoing Campaign', Coste: 3869.81, Impr: 1200623, Clics: 13617, Conversiones: 173, 'Valor de la conversión': 17921.81 },
-    { Canal: 'META', Territorio: 'Italia', 'Business unit': 'Tennis', Campaña: 'ADSM_IT_Tennis_ASC_Conversions_Ongoing Campaign', Coste: 5528.97, Impr: 1857506, Clics: 20007, Conversiones: 187, 'Valor de la conversión': 20582.07 },
-    { Canal: 'META', Territorio: 'Italia', 'Business unit': 'Sportswear', Campaña: 'ADSM_It_Sportswear_ASC_Conversions_Ongoing Campaign', Coste: 5286.72, Impr: 1237946, Clics: 22286, Conversiones: 268, 'Valor de la conversión': 24923.22 },
-    { Canal: 'META', Territorio: 'Italia', 'Business unit': 'Padel', Campaña: 'ADSM_It_Padel_ASC_Conversions_Ongoing Campaign', Coste: 3227.5, Impr: 986226, Clics: 11633, Conversiones: 188, 'Valor de la conversión': 15422.06 },
-    { Canal: 'META', Territorio: 'Italia', 'Business unit': 'Basketball', Campaña: 'ADSM_It_Basketball_ASC_Conversions_Ongoing Campaign', Coste: 2320.83, Impr: 866747, Clics: 12877, Conversiones: 116, 'Valor de la conversión': 5950.69 },
-    { Canal: 'META', Territorio: 'Reino Unido', 'Business unit': 'Sportswear', Campaña: 'ADSM_Uk_Sportswear_ASC_Conversions_Ongoing Campaign', Coste: 13594.18, Impr: 1473753, Clics: 26073, Conversiones: 480, 'Valor de la conversión': 62865.14 },
-    { Canal: 'META', Territorio: 'Reino Unido', 'Business unit': 'Tennis', Campaña: 'ADSM_Uk_Tennis_ASC_Conversions_Ongoing Campaign', Coste: 11163.37, Impr: 1725756, Clics: 23312, Conversiones: 511, 'Valor de la conversión': 68519.02 },
-    { Canal: 'META', Territorio: 'Reino Unido', 'Business unit': 'Padel', Campaña: 'ADSM_Uk_Padel_ASC_Conversions_Ongoing Campaign', Coste: 6954.86, Impr: 938001, Clics: 12629, Conversiones: 283, 'Valor de la conversión': 32567.65 },
-    { Canal: 'META', Territorio: 'Reino Unido', 'Business unit': 'Basketball', Campaña: 'ADSM_Uk_Basketball_ASC_Conversions_Ongoing Campaign', Coste: 5400.79, Impr: 1020453, Clics: 20441, Conversiones: 259, 'Valor de la conversión': 19860.18 },
-  ];
-
-  const initialDataGoogle = [
-    { Canal: 'GOOGLE', Territorio: 'Alemania', 'Business unit': 'Tennis', Campaña: 'ADSM_DE_Tennis_Search Brand_Conversions_Ongoing Campaign', Coste: 6650.37, Impr: 133091, Clics: 20212, Conversiones: 999.57, 'Valor de la conversión': 42589.01 },
-    { Canal: 'GOOGLE', Territorio: 'Alemania', 'Business unit': 'Padel', Campaña: 'ADSM_DE_Padel_Pmax_Conversions_Ongoing Campaign', Coste: 3542.5, Impr: 343721, Clics: 6477, Conversiones: 157.42, 'Valor de la conversión': 16525.76 },
-    { Canal: 'GOOGLE', Territorio: 'Alemania', 'Business unit': 'Tennis', Campaña: 'ADSM_DE_Tennis_Pmax_Conversions_Ongoing Campaign', Coste: 9402.88, Impr: 1442036, Clics: 27931, Conversiones: 684.91, 'Valor de la conversión': 75034.99 },
-    { Canal: 'GOOGLE', Territorio: 'Alemania', 'Business unit': 'Padel', Campaña: 'ADSM_DE_Padel_Search Brand_Conversions_Ongoing Campaign', Coste: 2567.49, Impr: 39736, Clics: 2156, Conversiones: 128.01, 'Valor de la conversión': 6507.85 },
-    { Canal: 'GOOGLE', Territorio: 'Alemania', 'Business unit': 'Tennis', Campaña: 'ADSM_DE_Tennis_DemandGen_Conversions_Roland Garros', Coste: 1435.5, Impr: 111100, Clics: 622, Conversiones: 76.24, 'Valor de la conversión': 4347.58 },
-    { Canal: 'GOOGLE', Territorio: 'Alemania', 'Business unit': 'Padel', Campaña: 'ADSM_DE_Padel_DemandGen_Conversions_Roland Garros', Coste: 673.28, Impr: 21245, Clics: 147, Conversiones: 0, 'Valor de la conversión': 0 },
-    { Canal: 'GOOGLE', Territorio: 'Alemania', 'Business unit': 'Basketball', Campaña: 'ADSM_DE_Basketball_DemandGen_Conversions_EuroCup', Coste: 1729.18, Impr: 125100, Clics: 1251, Conversiones: 134.19, 'Valor de la conversión': 9646.86 },
-    { Canal: 'GOOGLE', Territorio: 'Alemania', 'Business unit': 'Sportswear', Campaña: 'ADSM_DE_Sportswear_Pmax_Conversions_Ongoing Campaign', Coste: 7654.5, Impr: 456789, Clics: 8900, Conversiones: 345.2, 'Valor de la conversión': 28456.94 },
-    { Canal: 'GOOGLE', Territorio: 'España', 'Business unit': 'Tennis', Campaña: 'ADSM_ES_Tennis_Search Brand_Conversions_Ongoing Campaign', Coste: 2315.6, Impr: 198750, Clics: 32000, Conversiones: 398.42, 'Valor de la conversión': 1311.41 },
-    { Canal: 'GOOGLE', Territorio: 'España', 'Business unit': 'Padel', Campaña: 'ADSM_ES_Padel_Pmax_Conversions_Ongoing Campaign', Coste: 12450.7, Impr: 1560000, Clics: 34560, Conversiones: 805.11, 'Valor de la conversión': 101085.94 },
-    { Canal: 'GOOGLE', Territorio: 'España', 'Business unit': 'Tennis', Campaña: 'ADSM_ES_Tennis_DemandGen_Conversions_Roland Garros', Coste: 1045.2, Impr: 105600, Clics: 560, Conversiones: 21.05, 'Valor de la conversión': 2839.72 },
-    { Canal: 'GOOGLE', Territorio: 'España', 'Business unit': 'Sportswear', Campaña: 'ADSM_ES_Sportswear_Pmax_Conversions_Ongoing Campaign', Coste: 10560.1, Impr: 1200340, Clics: 23450, Conversiones: 533.4, 'Valor de la conversión': 19737.91 },
-    { Canal: 'GOOGLE', Territorio: 'Francia', 'Business unit': 'Tennis', Campaña: 'ADSM_FR_Tennis_Search Brand_Conversions_Ongoing Campaign', Coste: 5430.8, Impr: 120056, Clics: 18900, Conversiones: 320.25, 'Valor de la conversión': 29949.46 },
-    { Canal: 'GOOGLE', Territorio: 'Francia', 'Business unit': 'Padel', Campaña: 'ADSM_FR_Padel_Pmax_Conversions_Ongoing Campaign', Coste: 3670.9, Impr: 1100450, Clics: 25670, Conversiones: 199.15, 'Valor de la conversión': 2680.11 },
-    { Canal: 'GOOGLE', Territorio: 'Francia', 'Business unit': 'Sportswear', Campaña: 'ADSM_FR_Sportswear_Pmax_Conversions_Ongoing Campaign', Coste: 8780.4, Impr: 1560000, Clics: 34500, Conversiones: 44.22, 'Valor de la conversión': 2213.6 },
-    { Canal: 'GOOGLE', Territorio: 'Francia', 'Business unit': 'Basketball', Campaña: 'ADSM_FR_Basketball_Pmax_Conversions_Ongoing Campaign', Coste: 4560.5, Impr: 1234000, Clics: 15600, Conversiones: 882.34, 'Valor de la conversión': 13417.14 },
-    { Canal: 'GOOGLE', Territorio: 'Italia', 'Business unit': 'Tennis', Campaña: 'ADSM_IT_Tennis_Search Brand_Conversions_Ongoing Campaign', Coste: 4500.5, Impr: 98000, Clics: 15000, Conversiones: 248.5, 'Valor de la conversión': 16434.16 },
-    { Canal: 'GOOGLE', Territorio: 'Italia', 'Business unit': 'Padel', Campaña: 'ADSM_IT_Padel_Pmax_Conversions_Ongoing Campaign', Coste: 5670.3, Impr: 1345000, Clics: 25800, Conversiones: 298.6, 'Valor de la conversión': 26307.53 },
-    { Canal: 'GOOGLE', Territorio: 'Italia', 'Business unit': 'Tennis', Campaña: 'ADSM_IT_Tennis_DemandGen_Conversions_Roland Garros', Coste: 1200.4, Impr: 10200, Clics: 200, Conversiones: 3.1, 'Valor de la conversión': 239.8 },
-    { Canal: 'GOOGLE', Territorio: 'Italia', 'Business unit': 'Sportswear', Campaña: 'ADSM_IT_Sportswear_Pmax_Conversions_Ongoing Campaign', Coste: 6700.8, Impr: 1120000, Clics: 21500, Conversiones: 219.7, 'Valor de la conversión': 18276.26 },
-    { Canal: 'GOOGLE', Territorio: 'Reino Unido', 'Business unit': 'Tennis', Campaña: 'ADSM_UK_Tennis_Search Brand_Conversions_Ongoing Campaign', Coste: 7004.67, Impr: 66954, Clics: 15283, Conversiones: 1928.96, 'Valor de la conversión': 55416.4 },
-    { Canal: 'GOOGLE', Territorio: 'Reino Unido', 'Business unit': 'Sportswear', Campaña: 'ADSM_UK_Sportswear_Pmax_Conversions_Ongoing Campaign', Coste: 15301.23, Impr: 805217, Clics: 29353, Conversiones: 712.98, 'Valor de la conversión': 89436.95 },
-    { Canal: 'GOOGLE', Territorio: 'Reino Unido', 'Business unit': 'Tennis', Campaña: 'ADSM_UK_Tennis_DemandGen_Conversions_Roland Garros', Coste: 391.3, Impr: 59570, Clics: 856, Conversiones: 1.02, 'Valor de la conversión': 180.18 },
-    { Canal: 'GOOGLE', Territorio: 'Reino Unido', 'Business unit': 'Padel', Campaña: 'ADSM_UK_Padel_Pmax_Conversions_Ongoing Campaign', Coste: 6731.85, Impr: 800000, Clics: 18000, Conversiones: 359.2, 'Valor de la conversión': 42428.17 },
-    { Canal: 'GOOGLE', Territorio: 'Reino Unido', 'Business unit': 'Basketball', Campaña: 'ADSM_UK_Basketball_Pmax_Conversions_Ongoing Campaign', Coste: 4396.91, Impr: 1481028, Clics: 17470, Conversiones: 671.77, 'Valor de la conversión': 65046.46 },
-  ];
-
-  const initialDataCRM = [
-    { 'Business unit': 'tennis', Territorio: 'Alemania', Conversiones: 1239 },
-    { 'Business unit': 'tennis', Territorio: 'España', Conversiones: 2213 },
-    { 'Business unit': 'tennis', Territorio: 'Francia', Conversiones: 2341 },
-    { 'Business unit': 'tennis', Territorio: 'Italia', Conversiones: 4451 },
-    { 'Business unit': 'tennis', Territorio: 'Reino Unido', Conversiones: 3498 },
-    { 'Business unit': 'padel', Territorio: 'Alemania', Conversiones: 778 },
-    { 'Business unit': 'padel', Territorio: 'España', Conversiones: 1021 },
-    { 'Business unit': 'padel', Territorio: 'Francia', Conversiones: 695 },
-    { 'Business unit': 'padel', Territorio: 'Italia', Conversiones: 1059 },
-    { 'Business unit': 'padel', Territorio: 'Reino Unido', Conversiones: 1458 },
-    { 'Business unit': 'basketball', Territorio: 'Alemania', Conversiones: 421 },
-    { 'Business unit': 'basketball', Territorio: 'España', Conversiones: 699 },
-    { 'Business unit': 'basketball', Territorio: 'Francia', Conversiones: 850 },
-    { 'Business unit': 'basketball', Territorio: 'Italia', Conversiones: 997 },
-    { 'Business unit': 'basketball', Territorio: 'Reino Unido', Conversiones: 883 },
-    { 'Business unit': 'Sportswear', Territorio: 'Alemania', Conversiones: 376 },
-    { 'Business unit': 'Sportswear', Territorio: 'España', Conversiones: 442 },
-    { 'Business unit': 'Sportswear', Territorio: 'Francia', Conversiones: 833 },
-    { 'Business unit': 'Sportswear', Territorio: 'Italia', Conversiones: 975 },
-    { 'Business unit': 'Sportswear', Territorio: 'Reino Unido', Conversiones: 1030 },
-  ];
-
-  // Estado para la data consolidada y los filtros
-  const [consolidatedData, setConsolidatedData] = useState([]);
-  const [filters, setFilters] = useState({
-    plataforma: 'all',
-    businessUnit: 'all',
-    territorio: 'all',
-  });
-
-  // Efecto para consolidar la data al inicio
-  useEffect(() => {
-    const combinedData = [...initialDataMeta, ...initialDataGoogle];
-    const dataWithCRM = combinedData.map((row) => {
-      const crmMatch = initialDataCRM.find(
-        (crmRow) =>
-          crmRow.Territorio === row.Territorio &&
-          crmRow['Business unit'].toLowerCase() === row['Business unit'].toLowerCase()
-      );
-      const crmConversions = crmMatch ? crmMatch.Conversiones : 0;
-      return { ...row, 'Conversiones (CRM)': crmConversions };
-    });
-
-    const calculateKPIs = dataWithCRM.map((row) => {
-      const coste = row.Coste;
-      const conversiones = row.Conversiones;
-      const valorConversion = row['Valor de la conversión'];
-      const clics = row.Clics;
-      const impr = row.Impr;
-
-      return {
-        ...row,
-        ROAS: conversiones > 0 ? valorConversion / coste : 0,
-        CPA: conversiones > 0 ? coste / conversiones : 0,
-        CPC: clics > 0 ? coste / clics : 0,
-        CTR: impr > 0 ? (clics / impr) * 100 : 0,
-      };
-    });
-
-    setConsolidatedData(calculateKPIs);
-  }, []);
-
-  // Filtrar datos basado en el estado de los filtros
-  const filteredData = consolidatedData.filter((row) => {
-    const platformMatch = filters.plataforma === 'all' || row.Canal.toLowerCase() === filters.plataforma;
-    const businessUnitMatch = filters.businessUnit === 'all' || row['Business unit'].toLowerCase() === filters.businessUnit;
-    const territoryMatch = filters.territorio === 'all' || row.Territorio.toLowerCase() === filters.territorio;
-    return platformMatch && businessUnitMatch && territoryMatch;
-  });
-
-  // Calcular KPIs globales
-  const totalCost = filteredData.reduce((acc, row) => acc + row.Coste, 0);
-  const totalValue = filteredData.reduce((acc, row) => acc + row['Valor de la conversión'], 0);
-  const totalConversionsPlatform = filteredData.reduce((acc, row) => acc + row.Conversiones, 0);
-  const totalConversionsCRM = filteredData.reduce((acc, row) => acc + row['Conversiones (CRM)'], 0);
-  const globalROAS = totalCost > 0 ? totalValue / totalCost : 0;
-  const globalCPA = totalConversionsPlatform > 0 ? totalCost / totalConversionsPlatform : 0;
-  
-  // Agrupar datos para la tabla y gráficos
-  const groupedByBU = filteredData.reduce((acc, row) => {
-    const key = row['Business unit'];
-    if (!acc[key]) {
-      acc[key] = {
-        coste: 0,
-        valorConv: 0,
-        conversionsPlatform: 0,
-        conversionsCRM: 0,
-        count: 0,
-      };
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard de Análisis de Campañas</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- React & ReactDOM CDN -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <!-- Babel para compilar JSX en el navegador -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <!-- Font Awesome Icons - Reemplaza a Lucide -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" xintegrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2dThXj38K9l406pU9F4aB5EwB+K+2B5K+jK+9B+r+9B+z+9B+w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <!--
+    NOTA IMPORTANTE: 
+    Este código usa React y ReactDOM desde un CDN para que el navegador lo ejecute directamente.
+    Babel se usa para compilar el JSX (el código tipo HTML dentro del JavaScript) en tiempo real.
+    Esto permite que todo funcione en un solo archivo HTML, sin necesidad de un proceso de "build".
+  -->
+  <style>
+    body {
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
     }
-    acc[key].coste += row.Coste;
-    acc[key].valorConv += row['Valor de la conversión'];
-    acc[key].conversionsPlatform += row.Conversiones;
-    acc[key].conversionsCRM += row['Conversiones (CRM)'];
-    acc[key].count++;
-    return acc;
-  }, {});
+  </style>
+</head>
+<body class="bg-gray-50">
+  <div id="root"></div>
 
-  const groupedByPlatform = filteredData.reduce((acc, row) => {
-    const key = row.Canal;
-    if (!acc[key]) {
-      acc[key] = {
-        coste: 0,
-        valorConv: 0,
-        conversions: 0,
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    // Función para concatenar clases de Tailwind
+    const cn = (...classNames) => classNames.filter(Boolean).join(' ');
+
+    const App = () => {
+      // Datos iniciales de las plataformas y el CRM
+      const initialDataMeta = [
+        { Canal: 'META', Territorio: 'Alemania', 'Business unit': 'Tennis', Campaña: 'ADSM_DE_Tennis_ASC_Conversions_Ongoing Campaign', Coste: 3878.89, Impr: 556239, Clics: 15890, Conversiones: 181, 'Valor de la conversión': 23867.06 },
+        { Canal: 'META', Territorio: 'Alemania', 'Business unit': 'Sportswear', Campaña: 'ADSM_De_Sportswear_ASC_Conversions_Ongoing Campaign', Coste: 3523.78, Impr: 467213, Clics: 12317, Conversiones: 241, 'Valor de la conversión': 31783.97 },
+        { Canal: 'META', Territorio: 'Alemania', 'Business unit': 'Padel', Campaña: 'ADSM_De_Padel_ASC_Conversions_Ongoing Campaign', Coste: 2307.62, Impr: 281859, Clics: 2966, Conversiones: 118, 'Valor de la conversión': 18692.04 },
+        { Canal: 'META', Territorio: 'Alemania', 'Business unit': 'Basketball', Campaña: 'ADSM_De_Basketball_ASC_Conversions_Ongoing Campaign', Coste: 1545.74, Impr: 249431, Clics: 5893, Conversiones: 85, 'Valor de la conversión': 6740.19 },
+        { Canal: 'META', Territorio: 'España', 'Business unit': 'Tennis', Campaña: 'ADSM_ES_Tennis_ASC_Conversions_Ongoing Campaign', Coste: 5495.8, Impr: 1963362, Clics: 15805, Conversiones: 199, 'Valor de la conversión': 23291.88 },
+        { Canal: 'META', Territorio: 'España', 'Business unit': 'Sportswear', Campaña: 'ADSM_Es_Sportswear_ASC_Conversions_Ongoing Campaign', Coste: 5272.09, Impr: 1591100, Clics: 16164, Conversiones: 177, 'Valor de la conversión': 17863.3 },
+        { Canal: 'META', Territorio: 'España', 'Business unit': 'Padel', Campaña: 'ADSM_Es_Padel_ASC_Conversions_Ongoing Campaign', Coste: 3199.58, Impr: 1303509, Clics: 10220, Conversiones: 172, 'Valor de la conversión': 15435.96 },
+        { Canal: 'META', Territorio: 'España', 'Business unit': 'Basketball', Campaña: 'ADSM_Es_Basketball_ASC_Conversions_Ongoing Campaign', Coste: 2313.56, Impr: 868735, Clics: 3298, Conversiones: 83, 'Valor de la conversión': 9110.31 },
+        { Canal: 'META', Territorio: 'Francia', 'Business unit': 'Sportswear', Campaña: 'ADSM_FR_Sportswear_ASC_Conversions_Ongoing Campaign', Coste: 8817.61, Impr: 1595817, Clics: 24164, Conversiones: 347, 'Valor de la conversión': 35702.94 },
+        { Canal: 'META', Territorio: 'Francia', 'Business unit': 'Tennis', Campaña: 'ADSM_Fr_Tennis_ASC_Conversions_Ongoing Campaign', Coste: 8628.32, Impr: 2314681, Clics: 22359, Conversiones: 352, 'Valor de la conversión': 43996.98 },
+        { Canal: 'META', Territorio: 'Francia', 'Business unit': 'Padel', Campaña: 'ADSM_Fr_Padel_ASC_Conversions_Ongoing Campaign', Coste: 5095.07, Impr: 1243084, Clics: 12229, Conversiones: 211, 'Valor de la conversión': 26160.93 },
+        { Canal: 'META', Territorio: 'Francia', 'Business unit': 'Basketball', Campaña: 'ADSM_Fr_Basketball_ASC_Conversions_Ongoing Campaign', Coste: 3869.81, Impr: 1200623, Clics: 13617, Conversiones: 173, 'Valor de la conversión': 17921.81 },
+        { Canal: 'META', Territorio: 'Italia', 'Business unit': 'Tennis', Campaña: 'ADSM_IT_Tennis_ASC_Conversions_Ongoing Campaign', Coste: 5528.97, Impr: 1857506, Clics: 20007, Conversiones: 187, 'Valor de la conversión': 20582.07 },
+        { Canal: 'META', Territorio: 'Italia', 'Business unit': 'Sportswear', Campaña: 'ADSM_It_Sportswear_ASC_Conversions_Ongoing Campaign', Coste: 5286.72, Impr: 1237946, Clics: 22286, Conversiones: 268, 'Valor de la conversión': 24923.22 },
+        { Canal: 'META', Territorio: 'Italia', 'Business unit': 'Padel', Campaña: 'ADSM_It_Padel_ASC_Conversions_Ongoing Campaign', Coste: 3227.5, Impr: 986226, Clics: 11633, Conversiones: 188, 'Valor de la conversión': 15422.06 },
+        { Canal: 'META', Territorio: 'Italia', 'Business unit': 'Basketball', Campaña: 'ADSM_It_Basketball_ASC_Conversions_Ongoing Campaign', Coste: 2320.83, Impr: 866747, Clics: 12877, Conversiones: 116, 'Valor de la conversión': 5950.69 },
+        { Canal: 'META', Territorio: 'Reino Unido', 'Business unit': 'Sportswear', Campaña: 'ADSM_Uk_Sportswear_ASC_Conversions_Ongoing Campaign', Coste: 13594.18, Impr: 1473753, Clics: 26073, Conversiones: 480, 'Valor de la conversión': 62865.14 },
+        { Canal: 'META', Territorio: 'Reino Unido', 'Business unit': 'Tennis', Campaña: 'ADSM_Uk_Tennis_ASC_Conversions_Ongoing Campaign', Coste: 11163.37, Impr: 1725756, Clics: 23312, Conversiones: 511, 'Valor de la conversión': 68519.02 },
+        { Canal: 'META', Territorio: 'Reino Unido', 'Business unit': 'Padel', Campaña: 'ADSM_Uk_Padel_ASC_Conversions_Ongoing Campaign', Coste: 6954.86, Impr: 938001, Clics: 12629, Conversiones: 283, 'Valor de la conversión': 32567.65 },
+        { Canal: 'META', Territorio: 'Reino Unido', 'Business unit': 'Basketball', Campaña: 'ADSM_Uk_Basketball_ASC_Conversions_Ongoing Campaign', Coste: 5400.79, Impr: 1020453, Clics: 20441, Conversiones: 259, 'Valor de la conversión': 19860.18 },
+      ];
+
+      const initialDataGoogle = [
+        { Canal: 'GOOGLE', Territorio: 'Alemania', 'Business unit': 'Tennis', Campaña: 'ADSM_DE_Tennis_Search Brand_Conversions_Ongoing Campaign', Coste: 6650.37, Impr: 133091, Clics: 20212, Conversiones: 999.57, 'Valor de la conversión': 42589.01 },
+        { Canal: 'GOOGLE', Territorio: 'Alemania', 'Business unit': 'Padel', Campaña: 'ADSM_DE_Padel_Pmax_Conversions_Ongoing Campaign', Coste: 3542.5, Impr: 343721, Clics: 6477, Conversiones: 157.42, 'Valor de la conversión': 16525.76 },
+        { Canal: 'GOOGLE', Territorio: 'Alemania', 'Business unit': 'Tennis', Campaña: 'ADSM_DE_Tennis_Pmax_Conversions_Ongoing Campaign', Coste: 9402.88, Impr: 1442036, Clics: 27931, Conversiones: 684.91, 'Valor de la conversión': 75034.99 },
+        { Canal: 'GOOGLE', Territorio: 'Alemania', 'Business unit': 'Padel', Campaña: 'ADSM_DE_Padel_Search Brand_Conversions_Ongoing Campaign', Coste: 2567.49, Impr: 39736, Clics: 2156, Conversiones: 128.01, 'Valor de la conversión': 6507.85 },
+        { Canal: 'GOOGLE', Territorio: 'Alemania', 'Business unit': 'Tennis', Campaña: 'ADSM_DE_Tennis_DemandGen_Conversions_Roland Garros', Coste: 1435.5, Impr: 111100, Clics: 622, Conversiones: 76.24, 'Valor de la conversión': 4347.58 },
+        { Canal: 'GOOGLE', Territorio: 'Alemania', 'Business unit': 'Padel', Campaña: 'ADSM_DE_Padel_DemandGen_Conversions_Roland Garros', Coste: 673.28, Impr: 21245, Clics: 147, Conversiones: 0, 'Valor de la conversión': 0 },
+        { Canal: 'GOOGLE', Territorio: 'Alemania', 'Business unit': 'Basketball', Campaña: 'ADSM_DE_Basketball_DemandGen_Conversions_EuroCup', Coste: 1729.18, Impr: 125100, Clics: 1251, Conversiones: 134.19, 'Valor de la conversión': 9646.86 },
+        { Canal: 'GOOGLE', Territorio: 'Alemania', 'Business unit': 'Sportswear', Campaña: 'ADSM_DE_Sportswear_Pmax_Conversions_Ongoing Campaign', Coste: 7654.5, Impr: 456789, Clics: 8900, Conversiones: 345.2, 'Valor de la conversión': 28456.94 },
+        { Canal: 'GOOGLE', Territorio: 'España', 'Business unit': 'Tennis', Campaña: 'ADSM_ES_Tennis_Search Brand_Conversions_Ongoing Campaign', Coste: 2315.6, Impr: 198750, Clics: 32000, Conversiones: 398.42, 'Valor de la conversión': 1311.41 },
+        { Canal: 'GOOGLE', Territorio: 'España', 'Business unit': 'Padel', Campaña: 'ADSM_ES_Padel_Pmax_Conversions_Ongoing Campaign', Coste: 12450.7, Impr: 1560000, Clics: 34560, Conversiones: 805.11, 'Valor de la conversión': 101085.94 },
+        { Canal: 'GOOGLE', Territorio: 'España', 'Business unit': 'Tennis', Campaña: 'ADSM_ES_Tennis_DemandGen_Conversions_Roland Garros', Coste: 1045.2, Impr: 105600, Clics: 560, Conversiones: 21.05, 'Valor de la conversión': 2839.72 },
+        { Canal: 'GOOGLE', Territorio: 'España', 'Business unit': 'Sportswear', Campaña: 'ADSM_ES_Sportswear_Pmax_Conversions_Ongoing Campaign', Coste: 10560.1, Impr: 1200340, Clics: 23450, Conversiones: 533.4, 'Valor de la conversión': 19737.91 },
+        { Canal: 'GOOGLE', Territorio: 'Francia', 'Business unit': 'Tennis', Campaña: 'ADSM_FR_Tennis_Search Brand_Conversions_Ongoing Campaign', Coste: 5430.8, Impr: 120056, Clics: 18900, Conversiones: 320.25, 'Valor de la conversión': 29949.46 },
+        { Canal: 'GOOGLE', Territorio: 'Francia', 'Business unit': 'Padel', Campaña: 'ADSM_FR_Padel_Pmax_Conversions_Ongoing Campaign', Coste: 3670.9, Impr: 1100450, Clics: 25670, Conversiones: 199.15, 'Valor de la conversión': 2680.11 },
+        { Canal: 'GOOGLE', Territorio: 'Francia', 'Business unit': 'Sportswear', Campaña: 'ADSM_FR_Sportswear_Pmax_Conversions_Ongoing Campaign', Coste: 8780.4, Impr: 1560000, Clics: 34500, Conversiones: 44.22, 'Valor de la conversión': 2213.6 },
+        { Canal: 'GOOGLE', Territorio: 'Francia', 'Business unit': 'Basketball', Campaña: 'ADSM_FR_Basketball_Pmax_Conversions_Ongoing Campaign', Coste: 4560.5, Impr: 1234000, Clics: 15600, Conversiones: 882.34, 'Valor de la conversión': 13417.14 },
+        { Canal: 'GOOGLE', Territorio: 'Italia', 'Business unit': 'Tennis', Campaña: 'ADSM_IT_Tennis_Search Brand_Conversions_Ongoing Campaign', Coste: 4500.5, Impr: 98000, Clics: 15000, Conversiones: 248.5, 'Valor de la conversión': 16434.16 },
+        { Canal: 'GOOGLE', Territorio: 'Italia', 'Business unit': 'Padel', Campaña: 'ADSM_IT_Padel_Pmax_Conversions_Ongoing Campaign', Coste: 5670.3, Impr: 1345000, Clics: 25800, Conversiones: 298.6, 'Valor de la conversión': 26307.53 },
+        { Canal: 'GOOGLE', Territorio: 'Italia', 'Business unit': 'Tennis', Campaña: 'ADSM_IT_Tennis_DemandGen_Conversions_Roland Garros', Coste: 1200.4, Impr: 10200, Clics: 200, Conversiones: 3.1, 'Valor de la conversión': 239.8 },
+        { Canal: 'GOOGLE', Territorio: 'Italia', 'Business unit': 'Sportswear', Campaña: 'ADSM_IT_Sportswear_Pmax_Conversions_Ongoing Campaign', Coste: 6700.8, Impr: 1120000, Clics: 21500, Conversiones: 219.7, 'Valor de la conversión': 18276.26 },
+        { Canal: 'GOOGLE', Territorio: 'Reino Unido', 'Business unit': 'Tennis', Campaña: 'ADSM_UK_Tennis_Search Brand_Conversions_Ongoing Campaign', Coste: 7004.67, Impr: 66954, Clics: 15283, Conversiones: 1928.96, 'Valor de la conversión': 55416.4 },
+        { Canal: 'GOOGLE', Territorio: 'Reino Unido', 'Business unit': 'Sportswear', Campaña: 'ADSM_UK_Sportswear_Pmax_Conversions_Ongoing Campaign', Coste: 15301.23, Impr: 805217, Clics: 29353, Conversiones: 712.98, 'Valor de la conversión': 89436.95 },
+        { Canal: 'GOOGLE', Territorio: 'Reino Unido', 'Business unit': 'Tennis', Campaña: 'ADSM_UK_Tennis_DemandGen_Conversions_Roland Garros', Coste: 391.3, Impr: 59570, Clics: 856, Conversiones: 1.02, 'Valor de la conversión': 180.18 },
+        { Canal: 'GOOGLE', Territorio: 'Reino Unido', 'Business unit': 'Padel', Campaña: 'ADSM_UK_Padel_Pmax_Conversions_Ongoing Campaign', Coste: 6731.85, Impr: 800000, Clics: 18000, Conversiones: 359.2, 'Valor de la conversión': 42428.17 },
+        { Canal: 'GOOGLE', Territorio: 'Reino Unido', 'Business unit': 'Basketball', Campaña: 'ADSM_UK_Basketball_Pmax_Conversions_Ongoing Campaign', Coste: 4396.91, Impr: 1481028, Clics: 17470, Conversiones: 671.77, 'Valor de la conversión': 65046.46 },
+      ];
+
+      const initialDataCRM = [
+        { 'Business unit': 'tennis', Territorio: 'Alemania', Conversiones: 1239 },
+        { 'Business unit': 'tennis', Territorio: 'España', Conversiones: 2213 },
+        { 'Business unit': 'tennis', Territorio: 'Francia', Conversiones: 2341 },
+        { 'Business unit': 'tennis', Territorio: 'Italia', Conversiones: 4451 },
+        { 'Business unit': 'tennis', Territorio: 'Reino Unido', Conversiones: 3498 },
+        { 'Business unit': 'padel', Territorio: 'Alemania', Conversiones: 778 },
+        { 'Business unit': 'padel', Territorio: 'España', Conversiones: 1021 },
+        { 'Business unit': 'padel', Territorio: 'Francia', Conversiones: 695 },
+        { 'Business unit': 'padel', Territorio: 'Italia', Conversiones: 1059 },
+        { 'Business unit': 'padel', Territorio: 'Reino Unido', Conversiones: 1458 },
+        { 'Business unit': 'basketball', Territorio: 'Alemania', Conversiones: 421 },
+        { 'Business unit': 'basketball', Territorio: 'España', Conversiones: 699 },
+        { 'Business unit': 'basketball', Territorio: 'Francia', Conversiones: 850 },
+        { 'Business unit': 'basketball', Territorio: 'Italia', Conversiones: 997 },
+        { 'Business unit': 'basketball', Territorio: 'Reino Unido', Conversiones: 883 },
+        { 'Business unit': 'Sportswear', Territorio: 'Alemania', Conversiones: 376 },
+        { 'Business unit': 'Sportswear', Territorio: 'España', Conversiones: 442 },
+        { 'Business unit': 'Sportswear', Territorio: 'Francia', Conversiones: 833 },
+        { 'Business unit': 'Sportswear', Territorio: 'Italia', Conversiones: 975 },
+        { 'Business unit': 'Sportswear', Territorio: 'Reino Unido', Conversiones: 1030 },
+      ];
+
+      // Estado para la data consolidada y los filtros
+      const [consolidatedData, setConsolidatedData] = useState([]);
+      const [filters, setFilters] = useState({
+        plataforma: 'all',
+        businessUnit: 'all',
+        territorio: 'all',
+      });
+
+      // Efecto para consolidar la data al inicio
+      useEffect(() => {
+        const combinedData = [...initialDataMeta, ...initialDataGoogle];
+        const dataWithCRM = combinedData.map((row) => {
+          const crmMatch = initialDataCRM.find(
+            (crmRow) =>
+              crmRow.Territorio === row.Territorio &&
+              crmRow['Business unit'].toLowerCase() === row['Business unit'].toLowerCase()
+          );
+          const crmConversions = crmMatch ? crmMatch.Conversiones : 0;
+          return { ...row, 'Conversiones (CRM)': crmConversions };
+        });
+
+        const calculateKPIs = dataWithCRM.map((row) => {
+          const coste = row.Coste;
+          const conversiones = row.Conversiones;
+          const valorConversion = row['Valor de la conversión'];
+          const clics = row.Clics;
+          const impr = row.Impr;
+
+          return {
+            ...row,
+            ROAS: valorConversion > 0 && coste > 0 ? valorConversion / coste : 0,
+            CPA: conversiones > 0 ? coste / conversiones : 0,
+            CPC: clics > 0 ? coste / clics : 0,
+            CTR: impr > 0 ? (clics / impr) * 100 : 0,
+          };
+        });
+
+        setConsolidatedData(calculateKPIs);
+      }, []);
+
+      // Filtrar datos basado en el estado de los filtros
+      const filteredData = consolidatedData.filter((row) => {
+        const platformMatch = filters.plataforma === 'all' || row.Canal.toLowerCase() === filters.plataforma;
+        const businessUnitMatch = filters.businessUnit === 'all' || row['Business unit'].toLowerCase() === filters.businessUnit;
+        const territoryMatch = filters.territorio === 'all' || row.Territorio.toLowerCase() === filters.territorio;
+        return platformMatch && businessUnitMatch && territoryMatch;
+      });
+
+      // Calcular KPIs globales
+      const totalCost = filteredData.reduce((acc, row) => acc + row.Coste, 0);
+      const totalValue = filteredData.reduce((acc, row) => acc + row['Valor de la conversión'], 0);
+      const totalConversionsPlatform = filteredData.reduce((acc, row) => acc + row.Conversiones, 0);
+      const totalConversionsCRM = filteredData.reduce((acc, row) => acc + row['Conversiones (CRM)'], 0);
+      const globalROAS = totalCost > 0 ? totalValue / totalCost : 0;
+      const globalCPA = totalConversionsPlatform > 0 ? totalCost / totalConversionsPlatform : 0;
+      
+      // Agrupar datos para la tabla y gráficos
+      const groupedByBU = filteredData.reduce((acc, row) => {
+        const key = row['Business unit'];
+        if (!acc[key]) {
+          acc[key] = {
+            coste: 0,
+            valorConv: 0,
+            conversionsPlatform: 0,
+            conversionsCRM: 0,
+            count: 0,
+          };
+        }
+        acc[key].coste += row.Coste;
+        acc[key].valorConv += row['Valor de la conversión'];
+        acc[key].conversionsPlatform += row.Conversiones;
+        acc[key].conversionsCRM += row['Conversiones (CRM)'];
+        acc[key].count++;
+        return acc;
+      }, {});
+
+      const groupedByPlatform = filteredData.reduce((acc, row) => {
+        const key = row.Canal;
+        if (!acc[key]) {
+          acc[key] = {
+            coste: 0,
+            valorConv: 0,
+            conversions: 0,
+          };
+        }
+        acc[key].coste += row.Coste;
+        acc[key].valorConv += row['Valor de la conversión'];
+        acc[key].conversions += row.Conversiones;
+        return acc;
+      }, {});
+
+      const groupedByTerritory = filteredData.reduce((acc, row) => {
+        const key = row.Territorio;
+        if (!acc[key]) {
+          acc[key] = {
+            conversionsPlatform: 0,
+            conversionsCRM: 0,
+          };
+        }
+        acc[key].conversionsPlatform += row.Conversiones;
+        acc[key].conversionsCRM += row['Conversiones (CRM)'];
+        return acc;
+      }, {});
+
+      const formatCurrency = (value) => `$${Number(value).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
+      const formatNumber = (value) => Number(value).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+      
+      const getButtonClass = (filterType, filterValue) => {
+        return cn(
+          'px-4 py-2 rounded-full text-sm font-medium transition-colors duration-200',
+          filters[filterType] === filterValue
+            ? 'bg-blue-600 text-white shadow-lg'
+            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+        );
       };
-    }
-    acc[key].coste += row.Coste;
-    acc[key].valorConv += row['Valor de la conversión'];
-    acc[key].conversions += row.Conversiones;
-    return acc;
-  }, {});
 
-  const groupedByTerritory = filteredData.reduce((acc, row) => {
-    const key = row.Territorio;
-    if (!acc[key]) {
-      acc[key] = {
-        conversionsPlatform: 0,
-        conversionsCRM: 0,
-      };
-    }
-    acc[key].conversionsPlatform += row.Conversiones;
-    acc[key].conversionsCRM += row['Conversiones (CRM)'];
-    return acc;
-  }, {});
+      return (
+        <div className="min-h-screen bg-gray-50 font-sans p-6 md:p-10">
+          <div className="max-w-7xl mx-auto">
+            <h1 className="text-4xl md:text-5xl font-extrabold text-gray-800 mb-2">
+              Dashboard de Análisis de Campañas
+            </h1>
+            <p className="text-xl text-gray-500 mb-8">
+              Análisis interactivo de rendimiento de Google y Meta
+            </p>
 
-  const formatCurrency = (value) => `$${Number(value).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
-  const formatNumber = (value) => Number(value).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-  
-  const getButtonClass = (filterType, filterValue) => {
-    return cn(
-      'px-4 py-2 rounded-full text-sm font-medium transition-colors duration-200',
-      filters[filterType] === filterValue
-        ? 'bg-blue-600 text-white shadow-lg'
-        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-    );
-  };
-
-  return (
-    <div className="min-h-screen bg-gray-50 font-sans p-6 md:p-10">
-      <div className="max-w-7xl mx-auto">
-        <h1 className="text-4xl md:text-5xl font-extrabold text-gray-800 mb-2">
-          Dashboard de Análisis de Campañas
-        </h1>
-        <p className="text-xl text-gray-500 mb-8">
-          Análisis interactivo de rendimiento de Google y Meta
-        </p>
-
-        {/* Botones de Filtro */}
-        <div className="bg-white rounded-2xl shadow-xl p-6 mb-8">
-          <div className="flex flex-wrap gap-2 items-center mb-4">
-            <span className="text-gray-600 font-semibold text-base mr-2">Plataforma:</span>
-            <button
-              onClick={() => setFilters({ ...filters, plataforma: 'all' })}
-              className={getButtonClass('plataforma', 'all')}
-            >
-              Todas
-            </button>
-            <button
-              onClick={() => setFilters({ ...filters, plataforma: 'google' })}
-              className={getButtonClass('plataforma', 'google')}
-            >
-              Google
-            </button>
-            <button
-              onClick={() => setFilters({ ...filters, plataforma: 'meta' })}
-              className={getButtonClass('plataforma', 'meta')}
-            >
-              Meta
-            </button>
-          </div>
-          <div className="flex flex-wrap gap-2 items-center mb-4">
-            <span className="text-gray-600 font-semibold text-base mr-2">Business Unit:</span>
-            <button
-              onClick={() => setFilters({ ...filters, businessUnit: 'all' })}
-              className={getButtonClass('businessUnit', 'all')}
-            >
-              Todas
-            </button>
-            {['Tennis', 'Padel', 'Basketball', 'Sportswear'].map((bu) => (
-              <button
-                key={bu}
-                onClick={() => setFilters({ ...filters, businessUnit: bu.toLowerCase() })}
-                className={getButtonClass('businessUnit', bu.toLowerCase())}
-              >
-                {bu}
-              </button>
-            ))}
-          </div>
-          <div className="flex flex-wrap gap-2 items-center">
-            <span className="text-gray-600 font-semibold text-base mr-2">Territorio:</span>
-            <button
-              onClick={() => setFilters({ ...filters, territorio: 'all' })}
-              className={getButtonClass('territorio', 'all')}
-            >
-              Todos
-            </button>
-            {['Alemania', 'España', 'Francia', 'Italia', 'Reino Unido'].map((territorio) => (
-              <button
-                key={territorio}
-                onClick={() => setFilters({ ...filters, territorio: territorio.toLowerCase() })}
-                className={getButtonClass('territorio', territorio.toLowerCase())}
-              >
-                {territorio}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* KPIs Globales */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-2xl shadow-xl p-6 flex flex-col items-start">
-            <div className="flex items-center gap-3 text-gray-500 mb-2">
-              <DollarSign size={24} strokeWidth={1.5} />
-              <span className="font-semibold text-lg">Costo Total</span>
+            {/* Botones de Filtro */}
+            <div className="bg-white rounded-2xl shadow-xl p-6 mb-8">
+              <div className="flex flex-wrap gap-2 items-center mb-4">
+                <span className="text-gray-600 font-semibold text-base mr-2">Plataforma:</span>
+                <button
+                  onClick={() => setFilters({ ...filters, plataforma: 'all' })}
+                  className={getButtonClass('plataforma', 'all')}
+                >
+                  Todas
+                </button>
+                <button
+                  onClick={() => setFilters({ ...filters, plataforma: 'google' })}
+                  className={getButtonClass('plataforma', 'google')}
+                >
+                  Google
+                </button>
+                <button
+                  onClick={() => setFilters({ ...filters, plataforma: 'meta' })}
+                  className={getButtonClass('plataforma', 'meta')}
+                >
+                  Meta
+                </button>
+              </div>
+              <div className="flex flex-wrap gap-2 items-center mb-4">
+                <span className="text-gray-600 font-semibold text-base mr-2">Business Unit:</span>
+                <button
+                  onClick={() => setFilters({ ...filters, businessUnit: 'all' })}
+                  className={getButtonClass('businessUnit', 'all')}
+                >
+                  Todas
+                </button>
+                {['Tennis', 'Padel', 'Basketball', 'Sportswear'].map((bu) => (
+                  <button
+                    key={bu}
+                    onClick={() => setFilters({ ...filters, businessUnit: bu.toLowerCase() })}
+                    className={getButtonClass('businessUnit', bu.toLowerCase())}
+                  >
+                    {bu}
+                  </button>
+                ))}
+              </div>
+              <div className="flex flex-wrap gap-2 items-center">
+                <span className="text-gray-600 font-semibold text-base mr-2">Territorio:</span>
+                <button
+                  onClick={() => setFilters({ ...filters, territorio: 'all' })}
+                  className={getButtonClass('territorio', 'all')}
+                >
+                  Todos
+                </button>
+                {['Alemania', 'España', 'Francia', 'Italia', 'Reino Unido'].map((territorio) => (
+                  <button
+                    key={territorio}
+                    onClick={() => setFilters({ ...filters, territorio: territorio.toLowerCase() })}
+                    className={getButtonClass('territorio', territorio.toLowerCase())}
+                  >
+                    {territorio}
+                  </button>
+                ))}
+              </div>
             </div>
-            <span className="text-4xl font-bold text-gray-800">
-              {formatCurrency(totalCost)}
-            </span>
-          </div>
-          <div className="bg-white rounded-2xl shadow-xl p-6 flex flex-col items-start">
-            <div className="flex items-center gap-3 text-gray-500 mb-2">
-              <BarChart size={24} strokeWidth={1.5} />
-              <span className="font-semibold text-lg">Valor de Conversión</span>
+
+            {/* KPIs Globales */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+              <div className="bg-white rounded-2xl shadow-xl p-6 flex flex-col items-start">
+                <div className="flex items-center gap-3 text-gray-500 mb-2">
+                  <i className="fas fa-dollar-sign text-2xl text-gray-500"></i>
+                  <span className="font-semibold text-lg">Costo Total</span>
+                </div>
+                <span className="text-4xl font-bold text-gray-800">
+                  {formatCurrency(totalCost)}
+                </span>
+              </div>
+              <div className="bg-white rounded-2xl shadow-xl p-6 flex flex-col items-start">
+                <div className="flex items-center gap-3 text-gray-500 mb-2">
+                  <i className="fas fa-chart-bar text-2xl text-gray-500"></i>
+                  <span className="font-semibold text-lg">Valor de Conversión</span>
+                </div>
+                <span className="text-4xl font-bold text-gray-800">
+                  {formatCurrency(totalValue)}
+                </span>
+              </div>
+              <div className="bg-white rounded-2xl shadow-xl p-6 flex flex-col items-start">
+                <div className="flex items-center gap-3 text-gray-500 mb-2">
+                  <i className="fas fa-bullseye text-2xl text-gray-500"></i>
+                  <span className="font-semibold text-lg">ROAS Global</span>
+                </div>
+                <span className="text-4xl font-bold text-gray-800">
+                  {formatNumber(globalROAS)}x
+                </span>
+              </div>
+              <div className="bg-white rounded-2xl shadow-xl p-6 flex flex-col items-start">
+                <div className="flex items-center gap-3 text-gray-500 mb-2">
+                  <i className="fas fa-users text-2xl text-gray-500"></i>
+                  <span className="font-semibold text-lg">CPA Global</span>
+                </div>
+                <span className="text-4xl font-bold text-gray-800">
+                  {formatCurrency(globalCPA)}
+                </span>
+              </div>
             </div>
-            <span className="text-4xl font-bold text-gray-800">
-              {formatCurrency(totalValue)}
-            </span>
-          </div>
-          <div className="bg-white rounded-2xl shadow-xl p-6 flex flex-col items-start">
-            <div className="flex items-center gap-3 text-gray-500 mb-2">
-              <Target size={24} strokeWidth={1.5} />
-              <span className="font-semibold text-lg">ROAS Global</span>
-            </div>
-            <span className="text-4xl font-bold text-gray-800">
-              {formatNumber(globalROAS)}x
-            </span>
-          </div>
-          <div className="bg-white rounded-2xl shadow-xl p-6 flex flex-col items-start">
-            <div className="flex items-center gap-3 text-gray-500 mb-2">
-              <Users size={24} strokeWidth={1.5} />
-              <span className="font-semibold text-lg">CPA Global</span>
-            </div>
-            <span className="text-4xl font-bold text-gray-800">
-              {formatCurrency(globalCPA)}
-            </span>
-          </div>
-        </div>
-        
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            {/* Tabla de ROAS y CPA por Business Unit */}
-            <div className="bg-white rounded-2xl shadow-xl p-6">
-                <h2 className="text-2xl font-bold text-gray-800 mb-4">Rendimiento por Business Unit</h2>
-                <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200">
-                        <thead>
-                            <tr className="bg-gray-50">
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Business Unit</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Costo</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ROAS</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">CPA</th>
-                            </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
-                            {Object.entries(groupedByBU).map(([bu, data]) => (
-                                <tr key={bu}>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 capitalize">{bu}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatCurrency(data.coste)}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.coste > 0 ? `${formatNumber(data.valorConv / data.coste)}x` : '-'}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.conversionsPlatform > 0 ? formatCurrency(data.coste / data.conversionsPlatform) : '-'}</td>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                {/* Tabla de ROAS y CPA por Business Unit */}
+                <div className="bg-white rounded-2xl shadow-xl p-6">
+                    <h2 className="text-2xl font-bold text-gray-800 mb-4">Rendimiento por Business Unit</h2>
+                    <div className="overflow-x-auto">
+                        <table className="min-w-full divide-y divide-gray-200">
+                            <thead>
+                                <tr className="bg-gray-50">
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Business Unit</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Costo</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ROAS</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">CPA</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody className="bg-white divide-y divide-gray-200">
+                                {Object.entries(groupedByBU).map(([bu, data]) => (
+                                    <tr key={bu}>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 capitalize">{bu}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatCurrency(data.coste)}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.coste > 0 ? `${formatNumber(data.valorConv / data.coste)}x` : '-'}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{data.conversionsPlatform > 0 ? formatCurrency(data.coste / data.conversionsPlatform) : '-'}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                {/* Tabla de Conversiones vs CRM */}
+                <div className="bg-white rounded-2xl shadow-xl p-6">
+                    <h2 className="text-2xl font-bold text-gray-800 mb-4">Conversiones: Plataforma vs. CRM</h2>
+                    <div className="overflow-x-auto">
+                        <table className="min-w-full divide-y divide-gray-200">
+                            <thead>
+                                <tr className="bg-gray-50">
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Territorio</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Plataforma</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">CRM</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Discrepancia</th>
+                                </tr>
+                            </thead>
+                            <tbody className="bg-white divide-y divide-gray-200">
+                                {Object.entries(groupedByTerritory).map(([territorio, data]) => (
+                                    <tr key={territorio}>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 capitalize">{territorio}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatNumber(data.conversionsPlatform)}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatNumber(data.conversionsCRM)}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-bold">
+                                            {formatNumber(data.conversionsCRM - data.conversionsPlatform)}
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
-            {/* Tabla de Conversiones vs CRM */}
-            <div className="bg-white rounded-2xl shadow-xl p-6">
-                <h2 className="text-2xl font-bold text-gray-800 mb-4">Conversiones: Plataforma vs. CRM</h2>
-                <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200">
-                        <thead>
-                            <tr className="bg-gray-50">
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Territorio</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Plataforma</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">CRM</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Discrepancia</th>
-                            </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
-                            {Object.entries(groupedByTerritory).map(([territorio, data]) => (
-                                <tr key={territorio}>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 capitalize">{territorio}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatNumber(data.conversionsPlatform)}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatNumber(data.conversionsCRM)}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-bold">
-                                        {formatNumber(data.conversionsCRM - data.conversionsPlatform)}
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        {/* Gráfico de ROAS por Plataforma */}
-        <div className="bg-white rounded-2xl shadow-xl p-6 mb-8">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">ROAS Promedio por Plataforma</h2>
-            <div className="flex justify-between items-end h-64 p-4">
-                {Object.entries(groupedByPlatform).map(([platform, data]) => {
-                    const roas = data.coste > 0 ? data.valorConv / data.coste : 0;
-                    const maxRoas = Math.max(...Object.values(groupedByPlatform).map(d => d.coste > 0 ? d.valorConv / d.coste : 0));
-                    const height = maxRoas > 0 ? (roas / maxRoas) * 100 : 0;
-                    return (
-                        <div key={platform} className="flex flex-col items-center flex-grow mx-4">
-                            <div className="w-full flex-grow flex items-end">
-                                <div
-                                    className="w-full rounded-t-lg bg-blue-500"
-                                    style={{ height: `${height}%` }}
-                                ></div>
+            {/* Gráfico de ROAS por Plataforma */}
+            <div className="bg-white rounded-2xl shadow-xl p-6 mb-8">
+                <h2 className="text-2xl font-bold text-gray-800 mb-4">ROAS Promedio por Plataforma</h2>
+                <div className="flex justify-between items-end h-64 p-4">
+                    {Object.entries(groupedByPlatform).map(([platform, data]) => {
+                        const roas = data.coste > 0 ? data.valorConv / data.coste : 0;
+                        const maxRoas = Math.max(...Object.values(groupedByPlatform).map(d => d.coste > 0 ? d.valorConv / d.coste : 0));
+                        const height = maxRoas > 0 ? (roas / maxRoas) * 100 : 0;
+                        return (
+                            <div key={platform} className="flex flex-col items-center flex-grow mx-4">
+                                <div className="w-full flex-grow flex items-end">
+                                    <div
+                                        className="w-full rounded-t-lg bg-blue-500"
+                                        style={{ height: `${height}%` }}
+                                    ></div>
+                                </div>
+                                <span className="mt-2 text-sm text-gray-600 font-medium capitalize">{platform}</span>
+                                <span className="mt-1 text-xs text-gray-800 font-bold">{formatNumber(roas)}x</span>
                             </div>
-                            <span className="mt-2 text-sm text-gray-600 font-medium capitalize">{platform}</span>
-                            <span className="mt-1 text-xs text-gray-800 font-bold">{formatNumber(roas)}x</span>
-                        </div>
-                    );
-                })}
+                        );
+                    })}
+                </div>
             </div>
+          </div>
         </div>
+      );
+    };
 
-      </div>
-    </div>
-  );
-};
-
-// utility for className concatenation
-const cn = (...classNames) => classNames.filter(Boolean).join(' ');
-
-export default App;
+    // Renderizar la aplicación React
+    ReactDOM.render(
+      <App />,
+      document.getElementById('root')
+    );
+  </script>
+</body>
+</html>
